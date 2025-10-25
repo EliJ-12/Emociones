@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory - Emociones en Francés</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            color: #333;
+        }
+
+        h1 {
+            color: white;
+            margin: 20px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            font-size: 2.5em;
+        }
+
+        .menu {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 500px;
+        }
+
+        .menu h2 {
+            color: #667eea;
+            margin-bottom: 30px;
+        }
+
+        .menu button {
+            display: block;
+            width: 100%;
+            padding: 15px 30px;
+            margin: 15px 0;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .btn-facil {
+            background: #4ade80;
+            color: white;
+        }
+
+        .btn-medio {
+            background: #fbbf24;
+            color: white;
+        }
+
+        .btn-dificil {
+            background: #f87171;
+            color: white;
+        }
+
+        .btn-tiempo {
+            background: #8b5cf6;
+            color: white;
+        }
+
+        .menu button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .game-container {
+            display: none;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .game-info {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .info-item {
+            margin: 10px;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .timer {
+            color: #f87171;
+            font-size: 1.5em;
+        }
+
+        .moves {
+            color: #667eea;
+        }
+
+        .btn-volver {
+            background: #64748b;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+        }
+
+        .btn-volver:hover {
+            background: #475569;
+        }
+
+        .board {
+            display: grid;
+            gap: 15px;
+            padding: 20px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .board.facil {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .board.medio {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .board.dificil {
+            grid-template-columns: repeat(5, 1fr);
+        }
+
+        .card {
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            cursor: pointer;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+        }
+
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card.matched {
+            opacity: 0.6;
+            cursor: default;
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            border-radius: 15px;
+        }
+
+        .card-front {
+            background: white;
+            transform: rotateY(180deg);
+        }
+
+        .card-back {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 3em;
+        }
+
+        .emoji {
+            font-size: 2.5em;
+            margin-bottom: 8px;
+        }
+
+        .word {
+            font-size: 1.1em;
+            font-weight: 700;
+            color: #667eea;
+            text-align: center;
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            line-height: 1.3;
+            padding: 0 8px;
+        }
+
+        .translation {
+            font-size: 1em;
+            color: #2d3748;
+            margin-top: 8px;
+            font-family: 'Verdana', 'Tahoma', sans-serif;
+            font-weight: 600;
+            line-height: 1.3;
+            padding: 0 8px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 400px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .modal h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+
+        .modal p {
+            font-size: 1.2em;
+            margin: 15px 0;
+        }
+
+        .modal button {
+            margin-top: 20px;
+            padding: 12px 30px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            background: #667eea;
+            color: white;
+            font-weight: bold;
+        }
+
+        .modal button:hover {
+            background: #5568d3;
+        }
+
+        @media (max-width: 768px) {
+            .board.medio, .board.dificil {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            .emoji {
+                font-size: 2em;
+            }
+            
+            .word {
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>🎮 Memory - Emociones en Francés</h1>
+
+    <div id="menu" class="menu">
+        <h2>Selecciona el nivel</h2>
+        <button class="btn-facil" onclick="startGame('facil', false)">😊 Fácil (6 pares)</button>
+        <button class="btn-medio" onclick="startGame('medio', false)">😐 Medio (8 pares)</button>
+        <button class="btn-dificil" onclick="startGame('dificil', false)">😰 Difícil (10 pares)</button>
+        <button class="btn-tiempo" onclick="startGame('dificil', true)">⏱️ Contrareloj (10 pares - 5 min)</button>
+    </div>
+
+    <div id="gameContainer" class="game-container">
+        <div class="game-info">
+            <div class="info-item moves">Movimientos: <span id="moves">0</span></div>
+            <div class="info-item timer" id="timerDiv" style="display: none;">Tiempo: <span id="timer">5:00</span></div>
+            <button class="btn-volver" onclick="backToMenu()">← Volver al menú</button>
+        </div>
+        <div id="board" class="board"></div>
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <h2 id="modalTitle">¡Felicidades!</h2>
+            <p id="modalMessage"></p>
+            <button onclick="backToMenu()">Volver al menú</button>
+        </div>
+    </div>
+
+    <script>
+        const emotions = [
+            { french: 'Heureux', spanish: 'Feliz', emoji: '😊' },
+            { french: 'Triste', spanish: 'Triste', emoji: '😢' },
+            { french: 'En colère', spanish: 'Enojado', emoji: '😠' },
+            { french: 'Surpris', spanish: 'Sorprendido', emoji: '😲' },
+            { french: 'Amoureux', spanish: 'Enamorado', emoji: '😍' },
+            { french: 'Fatigué', spanish: 'Cansado', emoji: '😴' },
+            { french: 'Excité', spanish: 'Emocionado', emoji: '🤩' },
+            { french: 'Nerveux', spanish: 'Nervioso', emoji: '😰' },
+            { french: 'Effrayé', spanish: 'Asustado', emoji: '😱' },
+            { french: 'Calme', spanish: 'Tranquilo', emoji: '😌' },
+            { french: 'Confus', spanish: 'Confundido', emoji: '😕' },
+            { french: 'Ennuyé', spanish: 'Aburrido', emoji: '😑' },
+            { french: 'Joyeux', spanish: 'Alegre', emoji: '😄' },
+            { french: 'Mélancolique', spanish: 'Melancólico', emoji: '😔' },
+            { french: 'Anxieux', spanish: 'Ansioso', emoji: '😟' },
+            { french: 'Optimiste', spanish: 'Optimista', emoji: '😊' },
+            { french: 'Pessimiste', spanish: 'Pesimista', emoji: '😞' },
+            { french: 'Déçu', spanish: 'Decepcionado', emoji: '😥' },
+            { french: 'Fier', spanish: 'Orgulloso', emoji: '😎' },
+            { french: 'Honteux', spanish: 'Avergonzado', emoji: '😳' },
+            { french: 'Jaloux', spanish: 'Celoso', emoji: '😒' },
+            { french: 'Reconnaissant', spanish: 'Agradecido', emoji: '🙏' },
+            { french: 'Nostalgique', spanish: 'Nostálgico', emoji: '🥺' },
+            { french: 'Embarrassé', spanish: 'Avergonzado', emoji: '😅' },
+            { french: 'Solitaire', spanish: 'Solitario', emoji: '😶' },
+            { french: 'Content', spanish: 'Contento', emoji: '🙂' },
+            { french: 'Frustré', spanish: 'Frustrado', emoji: '😤' },
+            { french: 'Soulagé', spanish: 'Aliviado', emoji: '😮‍💨' },
+            { french: 'Inquiet', spanish: 'Preocupado', emoji: '😦' },
+            { french: 'Terrifié', spanish: 'Aterrorizado', emoji: '😨' },
+            { french: 'Euphorique', spanish: 'Eufórico', emoji: '🥳' },
+            { french: 'Désespéré', spanish: 'Desesperado', emoji: '😩' },
+            { french: 'Indifférent', spanish: 'Indiferente', emoji: '😐' },
+            { french: 'Curieux', spanish: 'Curioso', emoji: '🤔' },
+            { french: 'Motivé', spanish: 'Motivado', emoji: '💪' },
+            { french: 'Découragé', spanish: 'Desanimado', emoji: '😓' },
+            { french: 'Émerveillé', spanish: 'Maravillado', emoji: '😍' },
+            { french: 'Détendu', spanish: 'Relajado', emoji: '😇' },
+            { french: 'Stressé', spanish: 'Estresado', emoji: '😣' },
+            { french: 'Satisfait', spanish: 'Satisfecho', emoji: '😌' },
+            { french: 'Insatisfait', spanish: 'Insatisfecho', emoji: '😕' },
+            { french: 'Enthousiaste', spanish: 'Entusiasta', emoji: '🤗' },
+            { french: 'Apathique', spanish: 'Apático', emoji: '😶‍🌫️' },
+            { french: 'Furieux', spanish: 'Furioso', emoji: '😡' },
+            { french: 'Paisible', spanish: 'Pacífico', emoji: '☮️' },
+            { french: 'Agité', spanish: 'Agitado', emoji: '😖' },
+            { french: 'Espoir', spanish: 'Esperanzado', emoji: '🤞' },
+            { french: 'Timide', spanish: 'Tímido', emoji: '☺️' },
+            { french: 'Confiant', spanish: 'Confiado', emoji: '😏' },
+            { french: 'Choqué', spanish: 'Impactado', emoji: '😧' }
+        ];
+
+        let flippedCards = [];
+        let matchedPairs = 0;
+        let moves = 0;
+        let currentLevel = '';
+        let timedMode = false;
+        let timerInterval;
+        let timeLeft = 300;
+
+        function startGame(level, timed) {
+            currentLevel = level;
+            timedMode = timed;
+            moves = 0;
+            matchedPairs = 0;
+            flippedCards = [];
+            timeLeft = 300;
+            
+            document.getElementById('menu').style.display = 'none';
+            document.getElementById('gameContainer').style.display = 'block';
+            document.getElementById('moves').textContent = '0';
+            
+            if (timedMode) {
+                document.getElementById('timerDiv').style.display = 'block';
+                startTimer();
+            } else {
+                document.getElementById('timerDiv').style.display = 'none';
+            }
+
+            let numPairs;
+            switch(level) {
+                case 'facil': numPairs = 6; break;
+                case 'medio': numPairs = 8; break;
+                case 'dificil': numPairs = 10; break;
+            }
+
+            createBoard(numPairs);
+        }
+
+        function createBoard(numPairs) {
+            const board = document.getElementById('board');
+            board.innerHTML = '';
+            board.className = `board ${currentLevel}`;
+
+            // Seleccionar emociones aleatorias
+            const shuffledEmotions = [...emotions].sort(() => Math.random() - 0.5);
+            const selectedEmotions = shuffledEmotions.slice(0, numPairs);
+            const cards = [];
+
+            selectedEmotions.forEach((emotion, index) => {
+                cards.push({
+                    id: `image-${index}`,
+                    type: 'image',
+                    data: emotion,
+                    pairId: index
+                });
+                cards.push({
+                    id: `word-${index}`,
+                    type: 'word',
+                    data: emotion,
+                    pairId: index
+                });
+            });
+
+            shuffle(cards);
+
+            cards.forEach(card => {
+                const cardElement = document.createElement('div');
+                cardElement.className = 'card';
+                cardElement.dataset.id = card.id;
+                cardElement.dataset.pairId = card.pairId;
+
+                if (card.type === 'image') {
+                    cardElement.innerHTML = `
+                        <div class="card-back">🎴</div>
+                        <div class="card-front">
+                            <div class="emoji">${card.data.emoji}</div>
+                            <div class="translation">${card.data.spanish}</div>
+                        </div>
+                    `;
+                } else {
+                    cardElement.innerHTML = `
+                        <div class="card-back">🎴</div>
+                        <div class="card-front">
+                            <div class="word">${card.data.french}</div>
+                        </div>
+                    `;
+                }
+
+                cardElement.addEventListener('click', () => flipCard(cardElement));
+                board.appendChild(cardElement);
+            });
+        }
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function flipCard(card) {
+            if (flippedCards.length === 2 || card.classList.contains('flipped') || card.classList.contains('matched')) {
+                return;
+            }
+
+            card.classList.add('flipped');
+            flippedCards.push(card);
+
+            if (flippedCards.length === 2) {
+                moves++;
+                document.getElementById('moves').textContent = moves;
+                checkMatch();
+            }
+        }
+
+        function checkMatch() {
+            const [card1, card2] = flippedCards;
+
+            if (card1.dataset.pairId === card2.dataset.pairId) {
+                card1.classList.add('matched');
+                card2.classList.add('matched');
+                matchedPairs++;
+                flippedCards = [];
+
+                let totalPairs;
+                switch(currentLevel) {
+                    case 'facil': totalPairs = 6; break;
+                    case 'medio': totalPairs = 8; break;
+                    case 'dificil': totalPairs = 10; break;
+                }
+
+                if (matchedPairs === totalPairs) {
+                    setTimeout(() => endGame(true), 500);
+                }
+            } else {
+                setTimeout(() => {
+                    card1.classList.remove('flipped');
+                    card2.classList.remove('flipped');
+                    flippedCards = [];
+                }, 1000);
+            }
+        }
+
+        function startTimer() {
+            updateTimerDisplay();
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    endGame(false);
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('timer').textContent = 
+                `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function endGame(won) {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+
+            const modal = document.getElementById('modal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalMessage = document.getElementById('modalMessage');
+
+            if (won) {
+                modalTitle.textContent = '¡Felicidades! 🎉';
+                let message = `Has completado el nivel ${currentLevel} en ${moves} movimientos.`;
+                if (timedMode) {
+                    const timeTaken = 300 - timeLeft;
+                    const minutes = Math.floor(timeTaken / 60);
+                    const seconds = timeTaken % 60;
+                    message += ` Tiempo: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+                }
+                modalMessage.textContent = message;
+            } else {
+                modalTitle.textContent = '¡Tiempo agotado! ⏰';
+                modalMessage.textContent = 'No te preocupes, ¡inténtalo de nuevo!';
+            }
+
+            modal.style.display = 'flex';
+        }
+
+        function backToMenu() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+            document.getElementById('gameContainer').style.display = 'none';
+            document.getElementById('menu').style.display = 'block';
+            document.getElementById('modal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
